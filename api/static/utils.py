@@ -64,9 +64,3 @@ def encode_image_to_base64(
 
 def preprocess_replace_bg_image(image: np.ndarray, w: int, h: int) -> np.ndarray: 
     return cv2.resize(src=image, dsize=(w, h), interpolation=cv2.INTER_CUBIC)
-
-
-models: list = [
-    Model(),
-    Model(lightweight=True)
-]

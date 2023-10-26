@@ -4,7 +4,7 @@ from sanic import Sanic
 from sanic.request import Request
 from sanic.response import JSONResponse
 
-from static.utils import models, decode_image, encode_image_to_base64, preprocess_replace_bg_image
+from static.utils import Model, decode_image, encode_image_to_base64, preprocess_replace_bg_image
 
 STATIC_PATH: str = "static"
 VERSION: str = "1.0.0"
@@ -195,12 +195,26 @@ if __name__ == "__main__":
         workers = int(sys.argv[sys.argv.index(args_2) + 1])
 
     if mode == "local":
+        models: list = [
+            Model(),
+            Model(lightweight=True)
+        ]
         app.run(host="0.0.0.0", port=3030, dev=True, workers=workers)
 
     elif mode == "render":
+        models: list = [
+            "N/A",
+            Model(lightweight=True)
+        ]
+
         app.run(host="0.0.0.0", port=3030, single_process=True, access_log=True)
 
     elif mode == "prod":
+        models: list = [
+            Model(),
+            Model(lightweight=True)
+        ]
+
         app.run(host="0.0.0.0", port=3030, dev=False, workers=workers, access_log=True)
 
     else:
