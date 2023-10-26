@@ -1,0 +1,17 @@
+venv38
+venv39
+venv310
+venv311
+
+__pycache__
+.pytest_cache
+
+.vscode
+
+.vagrant
+
+*.ico
+!favicon.ico
+
+*.onnx
+!u2netp.onnx

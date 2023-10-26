@@ -1,0 +1,7 @@
+onnx==1.14.1
+sanic
+pytest==7.4.2
+pillow==10.0.1
+sanic-testing
+onnxruntime==1.16.0
+opencv-python-headless

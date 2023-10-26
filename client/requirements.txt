@@ -1,0 +1,4 @@
+pillow
+requests
+matplotlib==3.4.3
+opencv-python
