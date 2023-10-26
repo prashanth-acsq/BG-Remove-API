@@ -12,6 +12,7 @@ from PIL import Image
 
 
 INPUT_PATH: str = os.path.join(os.getcwd(), "input")
+OUTPUT_PATH: str = os.path.join(os.getcwd(), "output")
 
 
 def decode_image(imageData) -> np.ndarray:
@@ -59,28 +60,45 @@ def show_images(
 
 
 def main():
-    args_1: str = "--mode"
-    args_2: str = "--base-url"
-    args_3: str = "--li"
-    args_4: str = "--filename-1"
-    args_5: str = "--filename-2"
+    args_1: tuple = ("--mode", "-m")
+    args_2: tuple = ("--base-url", "-bu")
+    args_3: tuple = ("--filename-1", "-f1")
+    args_4: tuple = ("--filename-2", "-f2")
+    args_5: str = "-li"
+    args_6: tuple = ("--save", "-s")
 
     mode: str = "remove"
     base_url: str = "http://localhost:3030"
-    lightweight: bool = False
     filename_1: str = "Test_1.png"
     filename_2: str = "Test_2.png"
+    lightweight: bool = False
+    save: bool = False
 
-    if args_1 in sys.argv:
-        mode: str = sys.argv[sys.argv.index(args_1) + 1]
-    if args_2 in sys.argv:
-        base_url: str = sys.argv[sys.argv.index(args_2) + 1]
-    if args_3 in sys.argv:
-        lightweight = True
-    if args_4 in sys.argv:
-        filename_1: str = sys.argv[sys.argv.index(args_4) + 1]
+    if args_1[0] in sys.argv:
+        mode: str = sys.argv[sys.argv.index(args_1[0]) + 1]
+    if args_1[1] in sys.argv:
+        mode: str = sys.argv[sys.argv.index(args_1[1]) + 1]
+
+    if args_2[0] in sys.argv:
+        base_url: str = sys.argv[sys.argv.index(args_2[0]) + 1]
+    if args_2[1] in sys.argv:
+        base_url: str = sys.argv[sys.argv.index(args_2[1]) + 1]
+
+    if args_3[0] in sys.argv:
+        filename_1: str = sys.argv[sys.argv.index(args_3[0]) + 1]
+    if args_3[1] in sys.argv:
+        filename_1: str = sys.argv[sys.argv.index(args_3[1]) + 1]
+
+    if args_4[0] in sys.argv:
+        filename_2: str = sys.argv[sys.argv.index(args_4[0]) + 1]
+    if args_4[1] in sys.argv:
+        filename_2: str = sys.argv[sys.argv.index(args_4[1]) + 1]
+
     if args_5 in sys.argv:
-        filename_2: str = sys.argv[sys.argv.index(args_5) + 1]
+        lightweight = True
+
+    if args_6[0] or args_6[1] in sys.argv:
+        save = True
 
     if not lightweight:
         url: str = base_url + f"/{mode}"
@@ -96,19 +114,26 @@ def main():
     if mode == "remove":
         response = requests.request(method="POST", url=url, files=files)
         if response.status_code == 200:
-            show_images(
-                image_1=cv2.cvtColor(
-                    src=cv2.imread(
-                        os.path.join(INPUT_PATH, filename_1), cv2.IMREAD_COLOR
+            response_image = decode_image(response.json()["bglessImageData"])
+            if not save:
+                show_images(
+                    image_1=cv2.cvtColor(
+                        src=cv2.imread(
+                            os.path.join(INPUT_PATH, filename_1), cv2.IMREAD_COLOR
+                        ),
+                        code=cv2.COLOR_BGR2RGB,
                     ),
-                    code=cv2.COLOR_BGR2RGB,
-                ),
-                image_2=decode_image(response.json()["bglessImageData"]),
-                cmap_1="gnuplot2",
-                cmap_2="gnuplot2",
-                title_1="Original",
-                title_2="BG Removed Image",
-            )
+                    image_2=response_image,
+                    cmap_1="gnuplot2",
+                    cmap_2="gnuplot2",
+                    title_1="Original",
+                    title_2="BG Removed Image",
+                )
+            else:
+                cv2.imwrite(
+                    os.path.join(OUTPUT_PATH, "BG-Removed.png"),
+                    cv2.cvtColor(src=response_image, code=cv2.COLOR_RGB2BGR),
+                )
         else:
             print(f"Error {response.status_code} : {response.reason}")
 
@@ -125,19 +150,25 @@ def main():
         response = requests.request(method="POST", url=url, files=files)
 
         if response.status_code == 200:
-            show_images(
-                image_1=cv2.cvtColor(
-                    src=cv2.imread(
-                        os.path.join(INPUT_PATH, filename_1), cv2.IMREAD_COLOR
+            if not save:
+                show_images(
+                    image_1=cv2.cvtColor(
+                        src=cv2.imread(
+                            os.path.join(INPUT_PATH, filename_1), cv2.IMREAD_COLOR
+                        ),
+                        code=cv2.COLOR_BGR2RGB,
                     ),
-                    code=cv2.COLOR_BGR2RGB,
-                ),
-                image_2=decode_image(response.json()["bgreplaceImageData"]),
-                cmap_1="gnuplot2",
-                cmap_2="gnuplot2",
-                title_1="Original",
-                title_2="BG Replaced Image",
-            )
+                    image_2=decode_image(response.json()["bgreplaceImageData"]),
+                    cmap_1="gnuplot2",
+                    cmap_2="gnuplot2",
+                    title_1="Original",
+                    title_2="BG Replaced Image",
+                )
+            else:
+                cv2.imwrite(
+                    os.path.join(OUTPUT_PATH, "BG-Replaced.png"),
+                    cv2.cvtColor(src=response_image, code=cv2.COLOR_RGB2BGR),
+                )
         else:
             print(f"Error {response.status_code} : {response.reason}")
 

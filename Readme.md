@@ -12,8 +12,8 @@
 
 2. Client
 <pre>
-cd / && cd Repos/BG-Remove-API && cd api/venv38/scripts && activate & cd ../.. && title API-SERVER
-cd / && cd Repos/BG-Remove-API && cd client/venv38/scripts && activate & cd ../.. && title API-CLIENT 
+cd / && cd Repos/BG-Remove-API && cd api/venv38/scripts && activate & cd ../.. && title API-SERVER && cls
+cd / && cd Repos/BG-Remove-API && cd client/venv38/scripts && activate & cd ../.. && title API-CLIENT && cls
 </pre>
 
 <br>
