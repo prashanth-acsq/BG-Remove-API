@@ -3,7 +3,6 @@
 <br>
 
 1. API
-<br>
     1. `/remove`
     2. `/remove/li`
     3. `/replace`
