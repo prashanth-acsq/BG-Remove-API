@@ -8,6 +8,7 @@ from static.utils import Model, decode_image, encode_image_to_base64, preprocess
 
 STATIC_PATH: str = "static"
 VERSION: str = "1.0.0"
+models: list = []
 
 app = Sanic("BG-Remove-API")
 app.static("static", "static")
@@ -85,7 +86,7 @@ async def post_processing(request: Request, infer_type: str) -> JSONResponse:
     
     if infer_type == "remove":
         image = decode_image(request.files.get("file").body)
-        mask = models[1].infer(image=image)
+        mask = Model().infer(image=image)
         for i in range(3): image[:, :, i] = image[:, :, i] & mask
 
         return JSONResponse(
@@ -102,7 +103,7 @@ async def post_processing(request: Request, infer_type: str) -> JSONResponse:
         image_1 = decode_image(request.files.get("file_1").body)
         image_2 = decode_image(request.files.get("file_2").body)
 
-        mask = models[1].infer(image=image_1)
+        mask = Model().infer(image=image_1)
         mh, mw = mask.shape
         image_2 = preprocess_replace_bg_image(image_2, mw, mh)
 
@@ -136,7 +137,7 @@ async def post_processing_li(request: Request, infer_type: str) -> JSONResponse:
     
     if infer_type == "remove":
         image = decode_image(request.files.get("file").body)
-        mask = models[1].infer(image=image)
+        mask = Model(lightweight=True).infer(image=image)
         for i in range(3): image[:, :, i] = image[:, :, i] & mask
 
         return JSONResponse(
@@ -153,7 +154,7 @@ async def post_processing_li(request: Request, infer_type: str) -> JSONResponse:
         image_1 = decode_image(request.files.get("file_1").body)
         image_2 = decode_image(request.files.get("file_2").body)
 
-        mask = models[1].infer(image=image_1)
+        mask = Model(lightweight=True).infer(image=image_1)
         mh, mw = mask.shape
         image_2 = preprocess_replace_bg_image(image_2, mw, mh)
 
@@ -195,26 +196,12 @@ if __name__ == "__main__":
         workers = int(sys.argv[sys.argv.index(args_2) + 1])
 
     if mode == "local":
-        models: list = [
-            Model(),
-            Model(lightweight=True)
-        ]
         app.run(host="0.0.0.0", port=3030, dev=True, workers=workers)
 
     elif mode == "render":
-        models: list = [
-            "N/A",
-            Model(lightweight=True)
-        ]
-
         app.run(host="0.0.0.0", port=3030, single_process=True, access_log=True)
 
     elif mode == "prod":
-        models: list = [
-            Model(),
-            Model(lightweight=True)
-        ]
-
         app.run(host="0.0.0.0", port=3030, dev=False, workers=workers, access_log=True)
 
     else:

@@ -65,7 +65,6 @@ def main():
     args_3: tuple = ("--filename-1", "-f1")
     args_4: tuple = ("--filename-2", "-f2")
     args_5: str = "-li"
-    args_6: tuple = ("--save", "-s")
 
     mode: str = "remove"
     base_url: str = "http://localhost:3030"
@@ -97,9 +96,6 @@ def main():
     if args_5 in sys.argv:
         lightweight = True
 
-    if args_6[0] or args_6[1] in sys.argv:
-        save = True
-
     if not lightweight:
         url: str = base_url + f"/{mode}"
     else:
@@ -115,25 +111,23 @@ def main():
         response = requests.request(method="POST", url=url, files=files)
         if response.status_code == 200:
             response_image = decode_image(response.json()["bglessImageData"])
-            if not save:
-                show_images(
-                    image_1=cv2.cvtColor(
-                        src=cv2.imread(
-                            os.path.join(INPUT_PATH, filename_1), cv2.IMREAD_COLOR
-                        ),
-                        code=cv2.COLOR_BGR2RGB,
+            show_images(
+                image_1=cv2.cvtColor(
+                    src=cv2.imread(
+                        os.path.join(INPUT_PATH, filename_1), cv2.IMREAD_COLOR
                     ),
-                    image_2=response_image,
-                    cmap_1="gnuplot2",
-                    cmap_2="gnuplot2",
-                    title_1="Original",
-                    title_2="BG Removed Image",
-                )
-            else:
-                cv2.imwrite(
-                    os.path.join(OUTPUT_PATH, "BG-Removed.png"),
-                    cv2.cvtColor(src=response_image, code=cv2.COLOR_RGB2BGR),
-                )
+                    code=cv2.COLOR_BGR2RGB,
+                ),
+                image_2=response_image,
+                cmap_1="gnuplot2",
+                cmap_2="gnuplot2",
+                title_1="Original",
+                title_2="BG Removed Image",
+            )
+            cv2.imwrite(
+                os.path.join(OUTPUT_PATH, "BG-Removed.png"),
+                cv2.cvtColor(src=response_image, code=cv2.COLOR_RGB2BGR),
+            )
         else:
             print(f"Error {response.status_code} : {response.reason}")
 
@@ -150,25 +144,23 @@ def main():
         response = requests.request(method="POST", url=url, files=files)
 
         if response.status_code == 200:
-            if not save:
-                show_images(
-                    image_1=cv2.cvtColor(
-                        src=cv2.imread(
-                            os.path.join(INPUT_PATH, filename_1), cv2.IMREAD_COLOR
-                        ),
-                        code=cv2.COLOR_BGR2RGB,
+            show_images(
+                image_1=cv2.cvtColor(
+                    src=cv2.imread(
+                        os.path.join(INPUT_PATH, filename_1), cv2.IMREAD_COLOR
                     ),
-                    image_2=decode_image(response.json()["bgreplaceImageData"]),
-                    cmap_1="gnuplot2",
-                    cmap_2="gnuplot2",
-                    title_1="Original",
-                    title_2="BG Replaced Image",
-                )
-            else:
-                cv2.imwrite(
-                    os.path.join(OUTPUT_PATH, "BG-Replaced.png"),
-                    cv2.cvtColor(src=response_image, code=cv2.COLOR_RGB2BGR),
-                )
+                    code=cv2.COLOR_BGR2RGB,
+                ),
+                image_2=decode_image(response.json()["bgreplaceImageData"]),
+                cmap_1="gnuplot2",
+                cmap_2="gnuplot2",
+                title_1="Original",
+                title_2="BG Replaced Image",
+            )
+            cv2.imwrite(
+                os.path.join(OUTPUT_PATH, "BG-Replaced.png"),
+                cv2.cvtColor(src=response_image, code=cv2.COLOR_RGB2BGR),
+            )
         else:
             print(f"Error {response.status_code} : {response.reason}")
 
